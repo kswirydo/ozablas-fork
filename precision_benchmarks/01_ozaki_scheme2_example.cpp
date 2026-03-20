@@ -24,9 +24,9 @@
 
 int main() {
     // Problem dimensions
-    const size_t M = 8192;
-    const size_t N = 8192;
-    const size_t K = 8192;
+    const size_t M = 16384;
+    const size_t N = 16384;
+    const size_t K = 16384;
 
     std::cout << "==========================================\n";
     std::cout << " OzaBLAS Scheme II Example (" << M << "x" << N << ")\n";
@@ -91,7 +91,7 @@ int main() {
     exec->copy_to_host(h_C_ref.data(), d_C_ref, M * N * sizeof(double));
 
     // 5. Test Ozaki Scheme II at various slice counts
-    std::vector<int> test_slices = {4, 6, 8, 12, 16};
+    std::vector<int> test_slices = {4, 6, 8, 12, 16, 20};
 
     for (int slices : test_slices) {
         std::cout << "\n==========================================\n";

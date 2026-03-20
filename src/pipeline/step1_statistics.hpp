@@ -22,17 +22,17 @@ inline int32_t calculate_scheme2_k_param(double M_prod, int Q) {
 // Uses hardware's native warpSize to guarantee stable reductions
 __global__ void compute_row_shifts_A(
     const double* __restrict__ A,
-    int rows,
-    int cols,
+    size_t rows,
+    size_t cols,
     int32_t offset,
     int32_t* __restrict__ shifts)
 {
-    int row = blockIdx.x;
+    size_t row = blockIdx.x;
     if (row >= rows) return;
 
     int local_max = -1023;
 
-    for (int col = threadIdx.x; col < cols; col += blockDim.x) {
+    for (size_t col = threadIdx.x; col < cols; col += blockDim.x) {
         double v = fabs(A[row * cols + col]);
         if (v > 0.0) {
             int e;
@@ -77,16 +77,16 @@ __global__ void compute_row_shifts_A(
 
 __global__ void compute_col_shifts_B(
     const double* __restrict__ B,
-    int rows,
-    int cols,
+    size_t rows,
+    size_t cols,
     int32_t offset,
     int32_t* __restrict__ shifts)
 {
-    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    size_t col = blockIdx.x * blockDim.x + threadIdx.x;
     if (col >= cols) return;
 
     int local_max = -1023;
-    for (int row = 0; row < rows; ++row) {
+    for (size_t row = 0; row < rows; ++row) {
         double v = fabs(B[row * cols + col]);
         if (v > 0.0) {
             int e;

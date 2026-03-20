@@ -13,7 +13,7 @@ namespace ozablas {
 
 class WorkspaceScheme1 {
 public:
-    WorkspaceScheme1(std::shared_ptr<const Executor> exec, size_t M, size_t N, size_t K, int slices);
+    WorkspaceScheme1(std::shared_ptr<const Executor> exec, size_t M, size_t N, size_t K, size_t slices);
     ~WorkspaceScheme1();
 
     WorkspaceScheme1(const WorkspaceScheme1&) = delete;
@@ -24,7 +24,7 @@ public:
     size_t get_M() const { return M_; }
     size_t get_N() const { return N_; }
     size_t get_K() const { return K_; }
-    int get_slices() const { return slices_; }
+    size_t get_slices() const { return slices_; }
 
     int32_t* get_shift_A()   const { return d_shift_A_; }
     int32_t* get_shift_B()   const { return d_shift_B_; }
@@ -36,7 +36,7 @@ private:
     std::shared_ptr<const Executor> exec_;
 
     size_t M_, N_, K_;
-    int slices_;
+    size_t slices_;
 
     // Step 1: Matrix Statistics (FUSED)
     int32_t* d_shift_A_   = nullptr;
@@ -56,7 +56,7 @@ private:
 
 class WorkspaceScheme2 {
 public:
-    WorkspaceScheme2(std::shared_ptr<const Executor> exec, size_t M, size_t N, size_t K, int slices);
+    WorkspaceScheme2(std::shared_ptr<const Executor> exec, size_t M, size_t N, size_t K, size_t slices);
     ~WorkspaceScheme2();
 
     WorkspaceScheme2(const WorkspaceScheme2&) = delete;
@@ -67,7 +67,7 @@ public:
     size_t get_M() const { return M_; }
     size_t get_N() const { return N_; }
     size_t get_K() const { return K_; }
-    int get_slices() const { return slices_; }
+    size_t get_slices() const { return slices_; }
 
     int32_t* get_shift_A()   const { return d_shift_A_; }
     int32_t* get_shift_B()   const { return d_shift_B_; }
@@ -79,7 +79,7 @@ private:
     std::shared_ptr<const Executor> exec_;
 
     size_t M_, N_, K_;
-    int slices_;
+    size_t slices_;
 
     // Step 1: Matrix Statistics (FUSED)
     int32_t* d_shift_A_   = nullptr;

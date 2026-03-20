@@ -18,7 +18,7 @@ namespace ozablas {
 // WORKSPACE: OZAKI SCHEME I
 // =================================================================================================
 
-WorkspaceScheme1::WorkspaceScheme1(std::shared_ptr<const Executor> exec, size_t M, size_t N, size_t K, int slices)
+WorkspaceScheme1::WorkspaceScheme1(std::shared_ptr<const Executor> exec, size_t M, size_t N, size_t K, size_t slices)
     : exec_(exec), M_(M), N_(N), K_(K), slices_(slices)
 {
     if (!exec_) throw std::invalid_argument("OzaBLAS: Executor cannot be null.");
@@ -62,7 +62,7 @@ WorkspaceScheme1::~WorkspaceScheme1() {
 // Global thread-safe flag to ensure __constant__ memory is loaded strictly once per application lifetime.
 static std::once_flag init_crt_tables_flag;
 
-WorkspaceScheme2::WorkspaceScheme2(std::shared_ptr<const Executor> exec, size_t M, size_t N, size_t K, int slices)
+WorkspaceScheme2::WorkspaceScheme2(std::shared_ptr<const Executor> exec, size_t M, size_t N, size_t K, size_t slices)
     : exec_(exec), M_(M), N_(N), K_(K), slices_(slices)
 {
     if (!exec_) throw std::invalid_argument("OzaBLAS: Executor cannot be null.");

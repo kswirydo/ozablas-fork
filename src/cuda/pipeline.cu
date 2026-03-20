@@ -39,13 +39,13 @@ inline dim3 get_grid_dim(size_t rows, size_t cols) {
 
 void ozaki_scheme1_gemm(WorkspaceScheme1& ws, const double* A, const double* B, double* C, OzaTimings* timings) {
 
-    const int MAX_EVENTS = 64; // Safe upper bound for group tracking
+    const size_t MAX_EVENTS = 64; // Safe upper bound for group tracking
     cudaEvent_t start, e1, e2;
     cudaEvent_t ev_gemm_start[MAX_EVENTS], ev_gemm_end[MAX_EVENTS], ev_recon_end[MAX_EVENTS];
 
     if (timings) {
         cudaEventCreate(&start); cudaEventCreate(&e1); cudaEventCreate(&e2);
-        for(int i = 0; i < MAX_EVENTS; ++i) {
+        for(size_t i = 0; i < MAX_EVENTS; ++i) {
             cudaEventCreate(&ev_gemm_start[i]);
             cudaEventCreate(&ev_gemm_end[i]);
             cudaEventCreate(&ev_recon_end[i]);
@@ -56,7 +56,7 @@ void ozaki_scheme1_gemm(WorkspaceScheme1& ws, const double* A, const double* B, 
     int M = static_cast<int>(ws.get_M());
     int N = static_cast<int>(ws.get_N());
     int K = static_cast<int>(ws.get_K());
-    int slices = ws.get_slices();
+    size_t slices = ws.get_slices();
 
     dim3 block2D = get_block_dim();
     dim3 gridA = get_grid_dim(M, K);
@@ -104,8 +104,8 @@ void ozaki_scheme1_gemm(WorkspaceScheme1& ws, const double* A, const double* B, 
 
         bool first_in_group = true;
 
-        for (int s = 1; s <= g - 1; ++s) {
-            int t = g - s;
+        for (size_t s = 1; s <= g - 1; ++s) {
+            size_t t = g - s;
 
             if (s > slices || t > slices) continue;
 

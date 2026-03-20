@@ -47,18 +47,18 @@ __global__ void slice_scheme1_A(
     int rows, int cols, int slices, int beta,
     int8_t* __restrict__ A_slices)
 {
-    int col = blockIdx.x * blockDim.x + threadIdx.x;
-    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    size_t col = blockIdx.x * blockDim.x + threadIdx.x;
+    size_t row = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (row < rows && col < cols) {
-        int idx = row * cols + col;
+        size_t idx = row * cols + col;
         double aij = A[idx];
         int e_i = -neg_exponents[row];
 
         double scale_factor = ldexp(1.0, e_i + 1 - beta);
         double inv_scale_factor = ldexp(1.0, -(e_i + 1 - beta));
 
-        for (int s = 0; s < slices; ++s) {
+        for (size_t s = 0; s < slices; ++s) {
             double sigma = 0.75 * ldexp(scale_factor, 53 - beta * s);
             double A_s = extract_fp64_rn(aij, sigma);
 
@@ -73,21 +73,21 @@ __global__ void slice_scheme1_A(
 __global__ void slice_scheme1_B(
     const double* __restrict__ B,
     const int32_t* __restrict__ neg_exponents,
-    int rows, int cols, int slices, int beta,
+    size_t rows, size_t cols, size_t slices, int beta,
     int8_t* __restrict__ B_slices)
 {
-    int col = blockIdx.x * blockDim.x + threadIdx.x;
-    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    size_t col = blockIdx.x * blockDim.x + threadIdx.x;
+    size_t row = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (row < rows && col < cols) {
-        int idx = row * cols + col;
+        size_t idx = row * cols + col;
         double bij = B[idx];
         int e_j = -neg_exponents[col];
 
         double scale_factor = ldexp(1.0, e_j + 1 - beta);
         double inv_scale_factor = ldexp(1.0, -(e_j + 1 - beta));
 
-        for (int s = 0; s < slices; ++s) {
+        for (size_t s = 0; s < slices; ++s) {
             double sigma = 0.75 * ldexp(scale_factor, 53 - beta * s);
             double B_s = extract_fp64_rn(bij, sigma);
 
@@ -110,21 +110,21 @@ __global__ void slice_scheme1_B(
 __global__ void slice_scheme2_A(
     const double* __restrict__ A,
     const int32_t* __restrict__ shifts,
-    int rows, int cols, int slices,
+    size_t rows, size_t cols, size_t slices,
     int8_t* __restrict__ A_slices)
 {
-    int col = blockIdx.x * blockDim.x + threadIdx.x;
-    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    size_t col = blockIdx.x * blockDim.x + threadIdx.x;
+    size_t row = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (row < rows && col < cols) {
-        int idx = row * cols + col;
+        size_t idx = row * cols + col;
         double scaled = ldexp(A[idx], shifts[row]);
 
         // Protection against 64-bit overflow for 19+ slices
         if (fabs(scaled) < 9.0e18) {
             // Fast path: fits perfectly in 64-bit int
             int64_t truncated_val = static_cast<int64_t>(llrint(scaled));
-            for (int s = 0; s < slices; ++s) {
+            for (size_t s = 0; s < slices; ++s) {
                 #if defined(__CUDACC__) || defined(__HIPCC__)
                     uint8_t m = OZA_c_moduli_all[s];
                 #else
@@ -135,7 +135,7 @@ __global__ void slice_scheme2_A(
         } else {
             // Heavy path: uses exact floating-point remainder to avoid 64-bit overflow
             double rounded = rint(scaled); // Round to nearest integer exactly
-            for (int s = 0; s < slices; ++s) {
+            for (size_t s = 0; s < slices; ++s) {
                 #if defined(__CUDACC__) || defined(__HIPCC__)
                     int32_t m = static_cast<int32_t>(OZA_c_moduli_all[s]);
                 #else
@@ -163,19 +163,19 @@ __global__ void slice_scheme2_A(
 __global__ void slice_scheme2_B(
     const double* __restrict__ B,
     const int32_t* __restrict__ shifts,
-    int rows, int cols, int slices,
+    size_t rows, size_t cols, size_t slices,
     int8_t* __restrict__ B_slices)
 {
-    int col = blockIdx.x * blockDim.x + threadIdx.x;
-    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    size_t col = blockIdx.x * blockDim.x + threadIdx.x;
+    size_t row = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (row < rows && col < cols) {
-        int idx = row * cols + col;
+        size_t idx = row * cols + col;
         double scaled = ldexp(B[idx], shifts[col]);
         // Protection against 64-bit overflow for 19+ slices
         if (fabs(scaled) < 9.0e18) {
             int64_t truncated_val = static_cast<int64_t>(llrint(scaled));
-            for (int s = 0; s < slices; ++s) {
+            for (size_t s = 0; s < slices; ++s) {
                 #if defined(__CUDACC__) || defined(__HIPCC__)
                     uint8_t m = OZA_c_moduli_all[s];
                 #else
@@ -185,7 +185,7 @@ __global__ void slice_scheme2_B(
             }
         } else {
             double rounded = rint(scaled);
-            for (int s = 0; s < slices; ++s) {
+            for (size_t s = 0; s < slices; ++s) {
                 #if defined(__CUDACC__) || defined(__HIPCC__)
                     int32_t m = static_cast<int32_t>(OZA_c_moduli_all[s]);
                 #else

@@ -22,14 +22,14 @@ namespace pipeline {
         const int32_t* __restrict__ C_tc_group,
         const int32_t* __restrict__ neg_exp_A,
         const int32_t* __restrict__ neg_exp_B,
-        int rows, int cols, int g, int beta,
+        size_t rows, size_t cols, size_t g, int beta,
         double* __restrict__ C_out)
     {
-        int col = blockIdx.x * blockDim.x + threadIdx.x;
-        int row = blockIdx.y * blockDim.y + threadIdx.y;
+        size_t col = blockIdx.x * blockDim.x + threadIdx.x;
+        size_t row = blockIdx.y * blockDim.y + threadIdx.y;
 
         if (row < rows && col < cols) {
-            int idx = row * cols + col;
+            size_t idx = row * cols + col;
 
             int e_i = -neg_exp_A[row];
             int e_j = -neg_exp_B[col];
@@ -60,14 +60,14 @@ __global__ void reconstruct_scheme2_leq7(
     const int32_t* __restrict__ C_tc,
     const int32_t* __restrict__ shift_A,
     const int32_t* __restrict__ shift_B,
-    int rows, int cols, int slices,
+    size_t rows, size_t cols, size_t slices,
     double* __restrict__ C_out)
 {
-    int col = blockIdx.x * blockDim.x + threadIdx.x;
-    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    size_t col = blockIdx.x * blockDim.x + threadIdx.x;
+    size_t row = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (row < rows && col < cols) {
-        int idx = row * cols + col;
+        size_t idx = row * cols + col;
 
         #if defined(__CUDACC__) || defined(__HIPCC__)
             uint64_t M = OZA_c_M_prod_20[slices - 1][0];
@@ -78,7 +78,7 @@ __global__ void reconstruct_scheme2_leq7(
 
         uint64_t acc = 0;
 
-        for (int s = 0; s < slices; ++s) {
+        for (size_t s = 0; s < slices; ++s) {
             #if defined(__CUDACC__) || defined(__HIPCC__)
                 int32_t m_i = static_cast<int32_t>(OZA_c_moduli_all[s]);
                 uint64_t partial_mod = OZA_c_partial_moduli_20[slices - 1][s][0];
@@ -117,14 +117,14 @@ __global__ void reconstruct_scheme2_gt7(
     const int32_t* __restrict__ C_tc,
     const int32_t* __restrict__ shift_A,
     const int32_t* __restrict__ shift_B,
-    int rows, int cols, int slices,
+    size_t rows, size_t cols, size_t slices,
     double* __restrict__ C_out)
 {
-    int col = blockIdx.x * blockDim.x + threadIdx.x;
-    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    size_t col = blockIdx.x * blockDim.x + threadIdx.x;
+    size_t row = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (row < rows && col < cols) {
-        int idx = row * cols + col;
+        size_t idx = row * cols + col;
 
         #if defined(__CUDACC__) || defined(__HIPCC__)
             crt::uint256_t M(OZA_c_M_prod_20[slices - 1]);
@@ -135,7 +135,7 @@ __global__ void reconstruct_scheme2_gt7(
 
         crt::uint256_t acc; // Initializes to 0
 
-        for (int s = 0; s < slices; ++s) {
+        for (size_t s = 0; s < slices; ++s) {
             #if defined(__CUDACC__) || defined(__HIPCC__)
                 int32_t m_i = static_cast<int32_t>(OZA_c_moduli_all[s]);
                 uint64_t inv = OZA_c_mod_inv_20[slices - 1][s];
@@ -154,7 +154,7 @@ __global__ void reconstruct_scheme2_gt7(
             // Multiply partial_mod by c_i into a 256-bit term
             crt::uint256_t term;
             uint64_t carry = 0;
-            for (int i = 0; i < 4; ++i) {
+            for (size_t i = 0; i < 4; ++i) {
                 unsigned __int128 p = (unsigned __int128)partial_mod_ptr[i] * c_i + carry;
                 term.data[i] = (uint64_t)p;
                 carry = (uint64_t)(p >> 64);
