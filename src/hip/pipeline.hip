@@ -61,9 +61,9 @@ void ozaki_scheme1_gemm(WorkspaceScheme1& ws, const double* A, const double* B, 
         hipEventRecord(start);
     }
 
-    int M = static_cast<int>(ws.get_M());
-    int N = static_cast<int>(ws.get_N());
-    int K = static_cast<int>(ws.get_K());
+    size_t M = ws.get_M();
+    size_t N = ws.get_N();
+    size_t K = ws.get_K();
     int slices = ws.get_slices();
 
     dim3 block2D = get_block_dim();
@@ -188,9 +188,9 @@ void ozaki_scheme2_gemm(WorkspaceScheme2& ws, const double* A, const double* B, 
         hipEventRecord(start);
     }
 
-    int M = static_cast<int>(ws.get_M());
-    int N = static_cast<int>(ws.get_N());
-    int K = static_cast<int>(ws.get_K());
+    size_t M = ws.get_M();
+    size_t N = ws.get_N();
+    size_t K = ws.get_K();
     int slices = ws.get_slices();
 
     dim3 block2D = get_block_dim();
