@@ -80,8 +80,9 @@ if(OZABLAS_ENABLE_HIP)
         set(CMAKE_HIP_ARCHITECTURES "native")
     endif()
 
-    find_package(hip REQUIRED)
-    find_package(rocblas REQUIRED)
+    list(APPEND CMAKE_PREFIX_PATH "/opt/rocm")
+    find_package(hip REQUIRED CONFIG)
+    find_package(rocblas REQUIRED CONFIG)
 
     add_compile_definitions(OZA_BUILD_HIP)
 
